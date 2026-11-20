@@ -51,7 +51,7 @@ export default function Topbar() {
         {/* لوگو */}
         <div className="flex items-center gap-2 z-50 shrink-0">
           <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-primary rounded-full transition-colors" />
-          <span className="font-bold text-base md:text-xl text-foreground transition-colors">Caterie</span>
+          <span className="font-bold text-base md:text-xl text-foreground transition-colors">Orbit</span>
         </div>
 
         {/* 👇 ناوبری دسکتاپ - اصلاح شده برای نمایش هر سه لینک */}

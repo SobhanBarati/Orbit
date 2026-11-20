@@ -1,122 +1,149 @@
-# 🏢 Caterie - Modern HR Management Dashboard
+# 🪐 Orbit — Modern HR & Team Management Dashboard
 
-![Caterie Banner](https://img.shields.io/badge/Caterie-HR_Management-18181B?style=for-the-badge&logo=next.js&logoColor=white)
+![Orbit Banner](https://img.shields.io/badge/Orbit-HR_Management-F59E0B?style=for-the-badge&logo=next.js&logoColor=white)
 
-**Caterie** یک داشبورد مدرن و جامع برای مدیریت منابع انسانی (HR) است که با تمرکز بر تجربه کاربری (UX)، طراحی مینیمال و عملکرد بالا ساخته شده است. این سیستم به مدیران منابع انسانی و کارمندان امکان مدیریت یکپارچه‌ی پرسنل، حقوق و دستمزد، مرخصی‌ها، تسک‌های آنبوردینگ و تقویم جلسات را می‌دهد.
-
----
-
-## ✨ ویژگی‌های کلیدی
-
-### 🔐 احراز هویت و امنیت
-- **ورود بدون رمز (Passwordless):** احراز هویت امن با استفاده از کد یکبار مصرف (OTP) ارسال شده به ایمیل.
-- **کنترل دسترسی مبتنی بر نقش (RBAC):** تفکیک کامل دسترسی‌ها بین مدیر منابع انسانی (HR) و کارمندان عادی (Employee).
-- **محافظت از مسیرها:** استفاده از `Middleware` برای جلوگیری از دسترسی افراد غیرمجاز به صفحات داشبورد.
-
-### 👥 مدیریت پرسنل (People)
-- **پروفایل داینامیک:** مشاهده و ویرایش اطلاعات پرسنلی (نقش، تیم، موقعیت مکانی، حقوق پایه و مزایا).
-- **ویرایش گروهی:** امکان انتخاب چندین کاربر و تغییر وضعیت آن‌ها به صورت یکجا (Bulk Actions).
-- **تاریخچه فعالیت:** نمایش وضعیت (Active, Away, Inactive) با تگ‌های رنگی و فیلترهای هوشمند.
-
-### 💰 حقوق و دستمزد (Payroll)
-- **محاسبه خودکار:** محاسبه لحظه‌ای اضافه‌کاری (Overtime) بر اساس زمان کارکرد روزانه (بیش از ۸ ساعت).
-- **مدیریت مرخصی‌ها (Leave):** ثبت درخواست مرخصی توسط کارمند و تایید/رد آن توسط HR همراه با ارسال اعلان (Notification).
-- **دانلود فیش حقوقی:** خروجی CSV از اطلاعات حقوق و دستمزد هر کارمند.
-
-### 📅 تقویم و جلسات (Schedule)
-- **نمای هفتگی:** نمایش جلسات و رویدادها در یک Timeline زیبا.
-- **تنظیمات دسترسی رویداد:** تعیین سطح دسترسی برای هر جلسه (عمومی، فقط تیم من، یا خصوصی).
-- **مدیریت رویدادها:** ایجاد، ویرایش و حذف رویدادها بر اساس سطح دسترسی (سازنده یا HR).
-
-### ✅ تسک‌ها و آنبوردینگ (Onboarding)
-- **دسته‌بندی تسک‌ها:** تفکیک تسک‌ها به دسته‌های Paperwork، Setup و Team.
-- **پیگیری پیشرفت:** نوار پیشرفت (Progress Bar) به صورت داینامیک با تکمیل هر تسک.
-- **تایم‌ترکر (Time Tracker):** ثبت زمان کارکرد روزانه با قابلیت Pause و Resume.
-
-### 🎨 تم و ظاهر (Theme)
-- **پشتیبانی از Dark Mode:** جابجایی روان بین حالت روشن و تاریک.
-- **طراحی مینیمال:** استفاده از رنگ‌های ملایم، گرادیانت‌های ظریف و سایه‌های نرم برای تجربه بصری بهتر.
-- **ریسپانسیو:** نمایش بهینه در دستگاه‌های مختلف (دسکتاپ، تبلت و موبایل).
-
-### 🔔 سیستم اعلان‌ها (Notifications)
-- **اعلان‌های Real-time:** اطلاع‌رسانی درخواست‌های مرخصی به HR و اطلاع‌رسانی تایید/رد آن به کارمند.
-- **مدیریت خوانده‌شده‌ها:** امکان علامت‌گذاری اعلان‌ها به صورت تکی یا گروهی (Mark all as read).
+**Orbit** is a modern, comprehensive dashboard for Human Resources (HR) management, built with a focus on user experience, minimalist design, and high performance. It empowers HR managers and employees to seamlessly manage personnel, payroll, leave requests, onboarding tasks, and team schedules.
 
 ---
 
-## 🛠 تکنولوژی‌های استفاده شده
+## ✨ Key Features
 
-- **فریمورک:** [Next.js 14](https://nextjs.org/) (App Router)
-- **زبان:** [TypeScript](https://www.typescriptlang.org/)
-- **استایل‌دهی:** [Tailwind CSS](https://tailwindcss.com/)
-- **دیتابیس و ORM:** [PostgreSQL](https://www.postgresql.org/) + [Prisma](https://www.prisma.io/)
-- **مدیریت State و Data Fetching:** [TanStack Query (React Query)](https://tanstack.com/query/latest)
-- **انیمیشن:** [Framer Motion](https://www.framer.com/motion/)
-- **آیکون‌ها:** [Lucide React](https://lucide.dev/)
-- **کامپوننت‌های UI:** [Radix UI](https://www.radix-ui.com/) + شادسی‌ان (shadcn/ui)
+### 🔐 Authentication & Security
+- **Passwordless Login:** Secure authentication via One-Time Password (OTP) sent to the user's email.
+- **Role-Based Access Control (RBAC):** Complete separation of permissions between HR Managers and regular Employees.
+- **Route Protection:** `Middleware` prevents unauthorized access to dashboard pages.
+- **Rate Limiting:** All sensitive API routes (OTP, Events, Uploads, etc.) are protected by Upstash Redis.
+- **Input Validation:** All user inputs are validated using Zod schemas.
+
+### 👥 People Management
+- **Dynamic Profiles:** View and edit personnel data (role, team, location, base salary, and benefits).
+- **Bulk Actions:** Select multiple users and update their status at once.
+- **Activity History:** Display status (Active, Away, Inactive) with color-coded tags and smart filters.
+
+### 💰 Payroll & Time Tracking
+- **Automatic Calculation:** Real-time calculation of overtime based on daily work hours (over 8 hours).
+- **Leave Management:** Employees submit leave requests; HR approves/rejects them with automated notifications.
+- **Payslip Download:** Export each employee's payroll data as a CSV file.
+
+### 📅 Schedule & Events
+- **Weekly View:** Display meetings and events in a beautiful timeline.
+- **Event Visibility:** Set access levels for each meeting (Public, My Team Only, or Private).
+- **Event Management:** Create, edit, and delete events based on permissions (Creator or HR).
+
+### ✅ Tasks & Onboarding
+- **Task Categories:** Organize tasks into Paperwork, Setup, and Team categories.
+- **Progress Tracking:** A dynamic progress bar that updates as tasks are completed.
+- **Time Tracker:** Log daily work hours with Pause and Resume functionality.
+
+### 🎨 Theme & UI
+- **Dark Mode Support:** Smooth switching between light and dark modes.
+- **Minimalist Design:** Soft colors, subtle gradients, and gentle shadows for a better visual experience.
+- **Fully Responsive:** Optimized for desktop, tablet, and mobile devices.
+
+### 🔔 Notifications
+- **Real-time Alerts:** Notify HR of leave requests and inform employees of approval/rejection.
+- **Read Management:** Mark notifications as read individually or in bulk.
 
 ---
 
-## 🚀 راه‌اندازی پروژه (Local Setup)
+## 🛠 Tech Stack
 
-برای اجرای این پروژه روی سیستم خودتون، مراحل زیر رو دنبال کنید:
+| Layer | Technology |
+| :--- | :--- |
+| **Framework** | [Next.js 16](https://nextjs.org/) (App Router, Turbopack) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) |
+| **Database** | [PostgreSQL](https://www.postgresql.org/) (via [Neon](https://neon.tech/)) |
+| **ORM** | [Prisma](https://www.prisma.io/) |
+| **State Management** | [TanStack Query](https://tanstack.com/query) |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) |
+| **UI Components** | [shadcn/ui](https://ui.shadcn.com/) & [Radix UI](https://www.radix-ui.com/) |
+| **Animations** | [Framer Motion](https://www.framer.com/motion/) |
+| **Validation** | [Zod](https://zod.dev/) |
+| **Rate Limiting** | [Upstash Redis](https://upstash.com/) |
+| **Email** | [Resend](https://resend.com/) |
 
-### پیش‌نیازها
-- Node.js (نسخه 18 یا بالاتر)
-- PostgreSQL (یا یک دیتابیس ابری مثل Neon)
+---
 
-### نصب و اجرا
+## 🚀 Getting Started
 
-۱. مخزن را کلون کنید:
+### Prerequisites
+- Node.js 20+
+- PostgreSQL database (or a free Neon account)
+- Upstash Redis account (free tier)
+- Resend account (free tier)
+
+### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/caterie-dashboard.git
-cd caterie-dashboard
-
-۲. پکیج‌ها را نصب کنید:
-
+git clone https://github.com/YOUR_USERNAME/orbit-dashboard.git
+cd orbit-dashboard
+2. Install dependencies
 bash
 npm install
-۳. متغیرهای محیطی (.env) را تنظیم کنید:
-یک فایل .env در روت پروژه بسازید و مقادیر زیر را وارد کنید:
+3. Set up environment variables
+Create a .env file in the root directory and add the following:
 
 env
-DATABASE_URL="postgresql://user:password@localhost:5432/caterie"
-HR_SECRET_CODE="Your_Secret_key"
-۴. دیتابیس را همگام‌سازی کنید:
+# Database
+DATABASE_URL="postgresql://..."
 
+# Upstash Redis (Rate Limiting)
+UPSTASH_REDIS_REST_URL="https://..."
+UPSTASH_REDIS_REST_TOKEN="..."
+
+# Resend (Email)
+RESEND_API_KEY="re_..."
+
+# HR Invite Code (for registering as HR)
+HR_SECRET_CODE="HR-2026-SECRET"
+4. Set up the database
 bash
 npx prisma generate
 npx prisma db push
-۵. پروژه را اجرا کنید:
-
+5. Run the development server
 bash
 npm run dev
-حالا می‌توانید پروژه را در مرورگر خود روی آدرس http://localhost:3000 مشاهده کنید.
+Open http://localhost:3000 in your browser.
 
-📁 ساختار پروژه
+📁 Project Structure
 text
 src/
-├── app/                  # مسیرهای Next.js (App Router)
-│   ├── (dashboard)/      # صفحات داشبورد (Overview, People, Payroll)
+├── app/                  # Next.js App Router
+│   ├── (dashboard)/      # Dashboard pages (Overview, People, Payroll)
 │   ├── api/              # API Routes (Auth, Tasks, Events, Leaves, ...)
-│   ├── login/            # صفحه ورود با OTP
-│   └── register/         # صفحه ثبت‌نام
-├── components/           # کامپوننت‌های مشترک (Topbar, Modals, UI)
-├── features/             # کامپوننت‌های اختصاصی هر بخش
+│   ├── login/            # OTP Login page
+│   └── register/         # Registration page
+├── components/           # Shared components (Topbar, Modals, UI)
+├── features/             # Feature-specific components
 │   ├── overview/
 │   ├── people/
 │   └── payroll/
-├── lib/                  # پیکربندی‌ها (Prisma, Utils)
-└── prisma/               # فایل Schema دیتابیس
-🤝 مشارکت (Contributing)
-اگر ایده یا پیشنهادی برای بهبود پروژه دارید، خوشحال می‌شوم بشنوم!
-۱. پروژه را Fork کنید.
-۲. یک برنچ جدید بسازید (git checkout -b feature/AmazingFeature).
-۳. تغییرات را کامیت کنید (git commit -m 'Add some AmazingFeature').
-۴. پوش کنید (git push origin feature/AmazingFeature).
-۵. یک Pull Request باز کنید.
+├── lib/                  # Configurations (Prisma, Utils, Validations, Rate Limit)
+└── prisma/               # Database Schema
+🔒 Security
+Orbit takes security seriously:
 
-📄 لایسنس
-این پروژه تحت لایسنس MIT منتشر شده است.
+Rate Limiting: All sensitive API routes are protected by Upstash Redis (e.g., 3 requests/10min for OTP, 60 requests/min for general APIs).
 
-<div align="center"> <b>ساخته شده با ❤️ برای تیم‌های منابع انسانی</b> </div> 
+Input Validation: All user inputs are validated using Zod schemas.
+
+Secure Cookies: Session cookies are httpOnly, secure in production, and have a 7-day expiry.
+
+File Upload Limits: Uploads are limited to 2MB and 10 requests per minute per IP.
+
+🤝 Contributing
+Ideas and suggestions are always welcome!
+
+Fork the project.
+
+Create a new branch (git checkout -b feature/AmazingFeature).
+
+Commit your changes (git commit -m 'Add some AmazingFeature').
+
+Push to the branch (git push origin feature/AmazingFeature).
+
+Open a Pull Request.
+
+📄 License
+This project is licensed under the MIT License.
+
+<div align="center"> <b>Built with ❤️ for HR teams</b> </div>

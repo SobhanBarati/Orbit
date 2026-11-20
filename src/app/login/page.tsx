@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { Loader2, ArrowRight, ShieldCheck } from "lucide-react";
+import { Loader2, ArrowRight, ShieldCheck, Mail } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-    const handleSendOtp = async (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -26,10 +26,9 @@ export default function LoginPage() {
         body: JSON.stringify({ email }),
       });
 
-      // 🔍 چک می‌کنیم که آیا پاسخ از نوع JSON است یا خطای HTML
       const contentType = res.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("خطای داخلی سرور. لطفا دوباره تلاش کنید.");
+        throw new Error("Server error. Please try again.");
       }
 
       const data = await res.json();
@@ -55,10 +54,9 @@ export default function LoginPage() {
         body: JSON.stringify({ email, otp }),
       });
 
-      // 🔍 همین چک برای اینجا هم
       const contentType = res.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("خطای داخلی سرور. لطفا دوباره تلاش کنید.");
+        throw new Error("Server error. Please try again.");
       }
 
       const data = await res.json();
@@ -73,67 +71,88 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#FDFBF7] p-6">
-      <Card className="w-full max-w-md rounded-[32px] border-none shadow-xl bg-white p-8">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="w-2.5 h-2.5 bg-zinc-900 rounded-full" />
-          <span className="font-semibold text-lg text-zinc-900">Caterie Workspace</span>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+      
+      {/* 👇 پس‌زمینه با مدارهای نورانی */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center translate-y-[-5%]">
+        <div className="absolute h-[800px] w-[800px] rounded-full border border-primary/30"></div>
+        <div className="absolute h-[600px] w-[600px] rounded-full border border-primary/40"></div>
+        <div className="absolute h-[400px] w-[400px] rounded-full border border-primary/50"></div>
+        
+        <div className="absolute h-[500px] w-[500px] bg-primary/20 blur-[120px] rounded-full"></div>
+        <div className="absolute h-[300px] w-[300px] bg-primary/30 blur-[80px] rounded-full"></div>
+        
+        <div className="absolute top-1/4 right-1/4 h-[400px] w-[400px] bg-indigo-500/10 blur-[100px] rounded-full"></div>
+      </div>
+
+      {/* کارت اصلی */}
+      <Card className="relative z-10 w-full max-w-[420px] rounded-[32px] border border-black/5 dark:border-white/10 shadow-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl p-8 md:p-10 animate-in fade-in zoom-in-95 duration-500">
+        
+        {/* لوگو */}
+        <div className="flex items-center gap-3 mb-12">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+            <span className="text-white font-bold text-lg">O</span>
+          </div>
+          <span className="font-bold text-xl text-foreground tracking-tight">Orbit</span>
         </div>
 
-        <h1 className="text-2xl font-medium text-zinc-900 mb-2">
-          {step === "EMAIL" ? "Sign in to your account" : "Enter security code"}
+        <h1 className="text-3xl font-bold text-foreground mb-3 tracking-tight">
+          {step === "EMAIL" ? "Welcome back" : "Check your email"}
         </h1>
-        <p className="text-xs text-zinc-500 mb-6">
+        <p className="text-sm text-muted-foreground mb-10">
           {step === "EMAIL" 
             ? "Enter your work email to receive a one-time passcode." 
-            : `We've sent a 6-digit code to ${email}. Check your server console.`}
+            : `We've sent a 6-digit code to ${email}.`}
         </p>
 
         {error && (
-          <div className="mb-4 p-3 bg-rose-50 border border-rose-100 rounded-2xl text-xs text-rose-600">
+          <div className="mb-8 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-600 dark:text-rose-400 animate-in fade-in">
             {error}
           </div>
         )}
 
         {step === "EMAIL" ? (
-          <form onSubmit={handleSendOtp} className="space-y-4">
-            <div>
-              <label className="text-[13px] font-medium text-zinc-700 block mb-1.5">Email Address</label>
-              <input 
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@caterie.work"
-                className="w-full px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:border-zinc-300"
-              />
+          <form onSubmit={handleSendOtp} className="space-y-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-semibold text-foreground">Email Address</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <input 
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@orbit.work"
+                  className="w-full pl-12 pr-4 py-4 bg-background border border-border rounded-2xl text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground font-medium"
+                />
+              </div>
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-[#FFCE00] text-black font-medium text-sm rounded-full hover:bg-yellow-500 transition-colors shadow-sm disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-primary-foreground font-semibold text-sm rounded-2xl hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all shadow-lg shadow-primary/25 disabled:opacity-70"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Continue <ArrowRight className="w-4 h-4" /></>}
             </button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyOtp} className="space-y-4">
-            <div>
-              <label className="text-[13px] font-medium text-zinc-700 block mb-1.5">6-Digit Code</label>
+          <form onSubmit={handleVerifyOtp} className="space-y-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-semibold text-foreground">6-Digit Code</label>
               <input 
                 type="text"
                 maxLength={6}
                 required
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                placeholder="123456"
-                className="w-full px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-2xl text-center tracking-widest text-lg font-semibold focus:outline-none focus:border-zinc-300"
+                placeholder="000000"
+                className="w-full px-4 py-4 bg-background border border-border rounded-2xl text-center tracking-[0.5em] text-2xl font-bold focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-zinc-900 text-white font-medium text-sm rounded-full hover:bg-zinc-800 transition-colors shadow-sm disabled:opacity-70"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-primary-foreground font-semibold text-sm rounded-2xl hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all shadow-lg shadow-primary/25 disabled:opacity-70"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Verify & Sign In <ShieldCheck className="w-4 h-4" /></>}
             </button>
@@ -141,9 +160,9 @@ export default function LoginPage() {
         )}
 
         {step === "EMAIL" && (
-          <div className="mt-6 text-center text-xs text-zinc-500">
+          <div className="mt-12 text-center text-xs text-muted-foreground">
             Don't have an account?{" "}
-            <Link href="/register" className="text-zinc-900 font-medium underline">
+            <Link href="/register" className="text-primary font-semibold hover:underline underline-offset-4 transition-all">
               Create account
             </Link>
           </div>

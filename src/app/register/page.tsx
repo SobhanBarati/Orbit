@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { Loader2, UserPlus, KeyRound } from "lucide-react";
+import { Loader2, UserPlus, KeyRound, Mail, User, Briefcase, MapPin, ChevronDown } from "lucide-react"; // 👈 ChevronDown اضافه شد
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -44,146 +44,192 @@ export default function RegisterPage() {
   };
 
   return (
-    // کاهش پدینگ کلی صفحه از p-6 به p-4
-    <div className="flex min-h-screen items-center justify-center bg-[#FDFBF7] p-4">
-      {/* کاهش پدینگ کارت از p-8 به p-6 و حداکثر عرض */}
-      <Card className="w-full max-w-md rounded-[32px] border-none shadow-xl bg-white p-6 sm:p-7">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+      
+      {/* پس‌زمینه */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center translate-y-[-5%]">
+        <div className="absolute h-[900px] w-[900px] rounded-full border border-primary/20"></div>
+        <div className="absolute h-[700px] w-[700px] rounded-full border border-primary/30"></div>
+        <div className="absolute h-[500px] w-[500px] rounded-full border border-primary/40"></div>
+        <div className="absolute h-[600px] w-[600px] bg-primary/15 blur-[120px] rounded-full"></div>
+        <div className="absolute top-1/4 right-1/4 h-[400px] w-[400px] bg-indigo-500/10 blur-[100px] rounded-full"></div>
+      </div>
+
+      {/* کارت اصلی */}
+      <Card className="relative z-10 w-full max-w-[480px] rounded-[32px] border border-black/5 dark:border-white/10 shadow-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl p-6 md:p-7 animate-in fade-in zoom-in-95 duration-500">
         
-        {/* کاهش مارجین هدر */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-2.5 h-2.5 bg-zinc-900 rounded-full" />
-          <span className="font-semibold text-lg text-zinc-900">Caterie Workspace</span>
+        {/* لوگو */}
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 bg-gradient-to-br from-primary to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+            <span className="text-white font-bold text-lg">O</span>
+          </div>
+          <span className="font-bold text-xl text-foreground tracking-tight">Orbit</span>
         </div>
 
-        <h1 className="text-2xl font-medium text-zinc-900 mb-1">Create an account</h1>
-        <p className="text-[13px] text-zinc-500 mb-5">Enter your details to join your workspace.</p>
+        <h1 className="text-2xl font-bold text-foreground mb-1 tracking-tight">Create an account</h1>
+        <p className="text-sm text-muted-foreground mb-5">Enter your details to join your workspace.</p>
 
         {error && (
-          <div className="mb-4 p-3 bg-rose-50 border border-rose-100 rounded-2xl text-xs text-rose-600">
+          <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-600 dark:text-rose-400 animate-in fade-in">
             {error}
           </div>
         )}
 
-        {/* کاهش فاصله بین فیلدها از space-y-4 به space-y-3 */}
         <form onSubmit={handleRegister} className="space-y-3">
-          {/* فیلدهای نام و ایمیل */}
-          <div>
-            <label className="text-[12px] font-medium text-zinc-700 block mb-1">Full Name</label>
-            <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:border-zinc-300 transition-colors" />
+          {/* نام */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-foreground">Full Name</label>
+            <div className="relative group">
+              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <input 
+                type="text" 
+                required 
+                value={form.name} 
+                onChange={(e) => setForm({ ...form, name: e.target.value })} 
+                className="w-full pl-10 pr-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground" 
+                placeholder="e.g. Josh Hill"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="text-[12px] font-medium text-zinc-700 block mb-1">Email Address</label>
-            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:border-zinc-300 transition-colors" />
+          {/* ایمیل */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-foreground">Email Address</label>
+            <div className="relative group">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <input 
+                type="email" 
+                required 
+                value={form.email} 
+                onChange={(e) => setForm({ ...form, email: e.target.value })} 
+                className="w-full pl-10 pr-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground" 
+                placeholder="name@orbit.work"
+              />
+            </div>
           </div>
 
-          {/* فیلدهای تیم و نقش */}
+          {/* تیم و نقش */}
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[12px] font-medium text-zinc-700 block mb-1">Team</label>
-              <select 
-                value={form.team} 
-                onChange={(e) => setForm({ ...form, team: e.target.value })} 
-                disabled={form.accessLevel === "HR"}
-                className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:border-zinc-300 text-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <option>Design</option>
-                <option>Engineering</option>
-                <option>Product</option>
-                <option>Operations</option>
-              </select>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-foreground">Team</label>
+              <div className="relative group">
+                <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <select 
+                  value={form.team} 
+                  onChange={(e) => setForm({ ...form, team: e.target.value })} 
+                  disabled={form.accessLevel === "HR"}
+                  className="w-full pl-10 pr-8 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all appearance-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <option>Design</option>
+                  <option>Engineering</option>
+                  <option>Product</option>
+                  <option>Operations</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              </div>
             </div>
-            <div>
-              <label className="text-[12px] font-medium text-zinc-700 block mb-1">Role</label>
-              <select 
-                value={form.role} 
-                onChange={(e) => setForm({ ...form, role: e.target.value })} 
-                disabled={form.accessLevel === "HR"}
-                className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:border-zinc-300 text-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <option>Product Designer</option>
-                <option>Frontend Developer</option>
-                <option>Backend Developer</option>
-                <option>Product Manager</option>
-                <option>HR Manager</option>
-              </select>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-foreground">Role</label>
+              <div className="relative group">
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <select 
+                  value={form.role} 
+                  onChange={(e) => setForm({ ...form, role: e.target.value })} 
+                  disabled={form.accessLevel === "HR"}
+                  className="w-full pl-10 pr-8 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all appearance-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <option>Product Designer</option>
+                  <option>Frontend Developer</option>
+                  <option>Backend Developer</option>
+                  <option>Product Manager</option>
+                  <option>HR Manager</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              </div>
             </div>
           </div>
 
-          {/* فیلد لوکیشن */}
-          <div>
-            <label className="text-[12px] font-medium text-zinc-700 block mb-1">Location</label>
-            <select 
-              value={form.location} 
-              onChange={(e) => setForm({ ...form, location: e.target.value })} 
-              className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:border-zinc-300 text-zinc-900 transition-colors"
-            >
-              <option>Remote</option>
-              <option>London</option>
-              <option>Tehran</option>
-              <option>Lisbon</option>
-              <option>New York</option>
-            </select>
+          {/* لوکیشن */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-foreground">Location</label>
+            <div className="relative group">
+              <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <select 
+                value={form.location} 
+                onChange={(e) => setForm({ ...form, location: e.target.value })} 
+                className="w-full pl-10 pr-8 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
+              >
+                <option>Remote</option>
+                <option>London</option>
+                <option>Tehran</option>
+                <option>Lisbon</option>
+                <option>New York</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            </div>
           </div>
 
-          {/* انتخاب نوع اکانت */}
-          <div>
-            <label className="text-[12px] font-medium text-zinc-700 block mb-1">Account Type</label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="accessLevel" 
-                  value="EMPLOYEE" 
-                  checked={form.accessLevel === "EMPLOYEE"} 
-                  onChange={() => setForm({ ...form, accessLevel: "EMPLOYEE", hrCode: "" })} 
-                  className="w-4 h-4 text-zinc-900 focus:ring-zinc-900" 
-                />
-                <span className="text-sm text-zinc-700">Employee</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="accessLevel" 
-                  value="HR" 
-                  checked={form.accessLevel === "HR"} 
-                  onChange={() => setForm({ ...form, accessLevel: "HR", team: "Operations", role: "HR Manager" })} 
-                  className="w-4 h-4 text-zinc-900 focus:ring-zinc-900" 
-                />
-                <span className="text-sm text-zinc-700">HR Manager</span>
-              </label>
+          {/* نوع اکانت */}
+          <div className="flex flex-col gap-1.5 pt-1">
+            <label className="text-[12px] font-semibold text-foreground">Account Type</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, accessLevel: "EMPLOYEE", hrCode: "" })}
+                className={`flex-1 py-2 rounded-xl border text-[13px] font-medium transition-all ${
+                  form.accessLevel === "EMPLOYEE"
+                    ? "bg-primary/10 border-primary text-primary"
+                    : "bg-background border-border text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                Employee
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, accessLevel: "HR", team: "Operations", role: "HR Manager" })}
+                className={`flex-1 py-2 rounded-xl border text-[13px] font-medium transition-all ${
+                  form.accessLevel === "HR"
+                    ? "bg-primary/10 border-primary text-primary"
+                    : "bg-background border-border text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                HR Manager
+              </button>
             </div>
           </div>
 
           {/* فیلد رمز HR */}
           {form.accessLevel === "HR" && (
-            <div className="animate-in fade-in slide-in-from-top-2">
-              <label className="text-[12px] font-medium text-zinc-700 flex items-center gap-1.5 mb-1">
-                <KeyRound className="w-3.5 h-3.5" /> HR Invite Code
+            <div className="animate-in fade-in slide-in-from-top-2 flex flex-col gap-1 pt-1">
+              <label className="text-[12px] font-semibold text-foreground flex items-center gap-1.5">
+                <KeyRound className="w-3.5 h-3.5 text-primary" /> HR Invite Code
               </label>
               <input 
                 type="password" 
-                required 
-                name="hr_invite_code"
                 autoComplete="new-password"
+                required 
                 value={form.hrCode} 
                 onChange={(e) => setForm({ ...form, hrCode: e.target.value })} 
-                placeholder="Enter secret code provided by admin" 
-                className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-100 rounded-2xl text-sm focus:outline-none focus:border-zinc-300 transition-colors" 
+                placeholder="Enter secret code" 
+                className="w-full px-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground" 
               />
-              <p className="text-[10px] text-zinc-400 mt-1">This code is provided only by the company admin.</p>
             </div>
           )}
 
-          {/* کاهش مارجین بالای دکمه */}
-          <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 py-2.5 bg-zinc-900 text-white font-medium text-sm rounded-full hover:bg-zinc-800 transition-colors shadow-sm disabled:opacity-70 mt-2">
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full flex items-center justify-center gap-2 py-3 mt-2 bg-primary text-primary-foreground font-semibold text-sm rounded-2xl hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all shadow-lg shadow-primary/25 disabled:opacity-70"
+          >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Register Account <UserPlus className="w-4 h-4" /></>}
           </button>
         </form>
 
-        {/* کاهش مارجین فوتر */}
-        <div className="mt-4 text-center text-xs text-zinc-500">
-          Already have an account? <Link href="/login" className="text-zinc-900 font-medium underline">Sign in</Link>
+        <div className="mt-4 text-center text-xs text-muted-foreground">
+          Already have an account?{" "}
+          <Link href="/login" className="text-primary font-semibold hover:underline underline-offset-4 transition-all">
+            Sign in
+          </Link>
         </div>
       </Card>
     </div>
