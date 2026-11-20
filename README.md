@@ -94,7 +94,7 @@ UPSTASH_REDIS_REST_TOKEN="..."
 RESEND_API_KEY="re_..."
 
 # HR Invite Code (for registering as HR)
-HR_SECRET_CODE="HR-2026-SECRET"
+HR_SECRET_CODE="YOUR_HR_SECRET"
 4. Set up the database
 bash
 npx prisma generate
