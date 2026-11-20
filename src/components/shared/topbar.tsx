@@ -44,7 +44,7 @@ export default function Topbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-3 md:px-8 py-2 md:py-6 max-w-[1400px] mx-auto w-full transition-colors border-b border-border md:border-none">
+    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md px-3 md:px-8 py-2 md:py-6 max-w-350 mx-auto w-full transition-colors border-b border-border md:border-none">
       
       <div className="grid grid-cols-[auto_1fr_auto] items-center w-full gap-2 md:gap-4">
         

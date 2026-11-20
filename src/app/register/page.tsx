@@ -48,19 +48,19 @@ export default function RegisterPage() {
       
       {/* پس‌زمینه */}
       <div className="absolute inset-0 z-0 flex items-center justify-center translate-y-[-5%]">
-        <div className="absolute h-[900px] w-[900px] rounded-full border border-primary/20"></div>
-        <div className="absolute h-[700px] w-[700px] rounded-full border border-primary/30"></div>
-        <div className="absolute h-[500px] w-[500px] rounded-full border border-primary/40"></div>
-        <div className="absolute h-[600px] w-[600px] bg-primary/15 blur-[120px] rounded-full"></div>
-        <div className="absolute top-1/4 right-1/4 h-[400px] w-[400px] bg-indigo-500/10 blur-[100px] rounded-full"></div>
+        <div className="absolute h-225 w-225 rounded-full border border-primary/20"></div>
+        <div className="absolute h-175 w-175 rounded-full border border-primary/30"></div>
+        <div className="absolute h-125 w-125 rounded-full border border-primary/40"></div>
+        <div className="absolute h-150 w-150 bg-primary/15 blur-[120px] rounded-full"></div>
+        <div className="absolute top-1/4 right-1/4 h-100 w-100 bg-indigo-500/10 blur-[100px] rounded-full"></div>
       </div>
 
       {/* کارت اصلی */}
-      <Card className="relative z-10 w-full max-w-[480px] rounded-[32px] border border-black/5 dark:border-white/10 shadow-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl p-6 md:p-7 animate-in fade-in zoom-in-95 duration-500">
+      <Card className="relative z-10 w-full max-w-120 rounded-[32px] border border-black/5 dark:border-white/10 shadow-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl p-6 md:p-7 animate-in fade-in zoom-in-95 duration-500">
         
         {/* لوگو */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 bg-gradient-to-br from-primary to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+          <div className="w-9 h-9 bg-linear-to-br from-primary to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
             <span className="text-white font-bold text-lg">O</span>
           </div>
           <span className="font-bold text-xl text-foreground tracking-tight">Orbit</span>

@@ -75,22 +75,22 @@ export default function LoginPage() {
       
       {/* 👇 پس‌زمینه با مدارهای نورانی */}
       <div className="absolute inset-0 z-0 flex items-center justify-center translate-y-[-5%]">
-        <div className="absolute h-[800px] w-[800px] rounded-full border border-primary/30"></div>
-        <div className="absolute h-[600px] w-[600px] rounded-full border border-primary/40"></div>
-        <div className="absolute h-[400px] w-[400px] rounded-full border border-primary/50"></div>
+        <div className="absolute h-200 w-200 rounded-full border border-primary/30"></div>
+        <div className="absolute h-150 w-150 rounded-full border border-primary/40"></div>
+        <div className="absolute h-100 w-100 rounded-full border border-primary/50"></div>
         
-        <div className="absolute h-[500px] w-[500px] bg-primary/20 blur-[120px] rounded-full"></div>
-        <div className="absolute h-[300px] w-[300px] bg-primary/30 blur-[80px] rounded-full"></div>
+        <div className="absolute h-125 w-125 bg-primary/20 blur-[120px] rounded-full"></div>
+        <div className="absolute h-75 w-75 bg-primary/30 blur-[80px] rounded-full"></div>
         
-        <div className="absolute top-1/4 right-1/4 h-[400px] w-[400px] bg-indigo-500/10 blur-[100px] rounded-full"></div>
+        <div className="absolute top-1/4 right-1/4 h-100 w-100 bg-indigo-500/10 blur-[100px] rounded-full"></div>
       </div>
 
       {/* کارت اصلی */}
-      <Card className="relative z-10 w-full max-w-[420px] rounded-[32px] border border-black/5 dark:border-white/10 shadow-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl p-8 md:p-10 animate-in fade-in zoom-in-95 duration-500">
+      <Card className="relative z-10 w-full max-w-105 rounded-[32px] border border-black/5 dark:border-white/10 shadow-2xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl p-8 md:p-10 animate-in fade-in zoom-in-95 duration-500">
         
         {/* لوگو */}
         <div className="flex items-center gap-3 mb-12">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+          <div className="w-10 h-10 bg-linear-to-br from-primary to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
             <span className="text-white font-bold text-lg">O</span>
           </div>
           <span className="font-bold text-xl text-foreground tracking-tight">Orbit</span>
