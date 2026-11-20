@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
     // ۶. ارسال ایمیل با Resend
     const { data, error } = await resend.emails.send({
-      from: "Caterie <kinglittle966@gmail.com>",
+      from: "Caterie <onboarding@resend.dev>",
       to: validatedEmail,
       subject: "Your Caterie Verification Code",
       html: `
