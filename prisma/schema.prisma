@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// جدول کاربران (شامل اطلاعات پروفایل و جدول People)
+model User {
+  id             String    @id @default(cuid())
+  name           String
+  email          String    @unique
+  avatar         String?
+  role           String    
+  team           String    
+  location       String    
+  joinedAt       DateTime  @default(now())
+  status         String    @default("Active") 
+  
+  // فیلدهای احراز هویت
+  otp            String?   
+  otpExpiresAt   DateTime? 
+  
+  // 👇 این خط رو اضافه کنید 👇
+  accessLevel    String    @default("EMPLOYEE")
+
+  baseSalary     Float?    
+  nextReviewDate DateTime?
+
+  pensionPlan    String?   @default("Standard") // مثلا Standard, Premium, None
+  devices        String?   @default("MacBook Pro") // مثلا MacBook Pro, Windows Laptop
+  benefits       String?   @default("Health Insurance") // مثلا Health Insurance, Gym
+
+  tasks          Task[]
+  timeLogs       TimeLog[]
+
+  lastLoginAt    DateTime?
+  
+  emailAlerts    Boolean   @default(true)
+  pushAlerts     Boolean   @default(false)
+  weeklyDigest   Boolean   @default(true)
+  taskUpdates    Boolean   @default(true)
+
+  leaves Leave[]
+
+  notifications Notification[]
+
+  events      Event[]
+}
+
+// جدول تسک‌های بخش Onboarding
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  category    String   @default("Paperwork") // این خط اضافه شد
+  dueDate     DateTime
+  isCompleted Boolean  @default(false)
+
+  isRead      Boolean  @default(false) 
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+// جدول ثبت زمان (Time Tracker و نمودار Progress)
+model TimeLog {
+  id        String   @id @default(cuid())
+  date      DateTime @default(now())
+  duration  Int      // مدت زمان به دقیقه یا ثانیه
+  overtime  Int      @default(0)
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// جدول رویدادهای تقویم
+model Event {
+  id          String   @id @default(cuid())
+  title       String   
+  date        DateTime
+  type        String?  
+  location    String?  
+
+  // 👇 فیلدهای جدید
+  visibility  String   @default("ALL") // "ALL", "TEAM", "PRIVATE"
+  creatorId   String?  // آیدی کسی که رویداد رو ساخته
+  creator     User?    @relation(fields: [creatorId], references: [id], onDelete: SetNull) // ارتباط با کاربر
+}
+
+// 👇 این مدل رو به انتهای فایل اضافه کن
+model Leave {
+  id        String   @id @default(cuid())
+  type      String   // Annual, Sick, etc.
+  startDate DateTime
+  endDate   DateTime
+  days      Int
+  status    String   @default("Pending") // Pending, Approved, Rejected
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String   // "leave_request", "leave_approved", "leave_rejected"
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}

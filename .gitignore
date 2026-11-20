@@ -1,0 +1,23 @@
+# 👇 فایل‌های محیطی (شامل رمزها و کلیدهای API)
+.env
+.env.local
+.env.*.local
+
+# 👇 فایل‌های تست شخصی (شامل کوکی لاگین)
+test-rate-limit.js
+clean-test-events.js
+
+# 👇 فایل‌های آپلود شده کاربران
+public/uploads/
+
+# 👇 پوشه‌های سیستم و ادیتور
+.next/
+node_modules/
+.DS_Store
+*.log
+
+# 👇 پوشه‌های تنظیمات شخصی ادیتور (اختیاری)
+.agents/
+.claude/
+.cursor/
+.devin/
