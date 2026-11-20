@@ -1,17 +1,23 @@
+
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { v2 as cloudinary } from "cloudinary";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-import { uploadLimiter } from "@/lib/rate-limit"; // 👈 ایمپورت لیمیتر آپلود
+import { uploadLimiter } from "@/lib/rate-limit";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req: Request) {
-  // 👇 چک کردن محدودیت آپلود
   const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
   const { success } = await uploadLimiter.limit(ip);
+
   if (!success) {
     return NextResponse.json(
-      { error: "Too many uploads. Please try again later." }, 
+      { error: "Too many uploads. Please try again later." },
       { status: 429 }
     );
   }
@@ -21,48 +27,81 @@ export async function POST(req: Request) {
     const userId = cookieStore.get("caterie_session")?.value;
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const data = await req.formData();
-    const file: File | null = data.get("file") as unknown as File;
+    const file = data.get("file");
 
-    if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    if (!(file instanceof File)) {
+      return NextResponse.json(
+        { error: "No file uploaded" },
+        { status: 400 }
+      );
     }
 
-    // 👇 محدودیت سایز فایل (۲ مگابایت) برای جلوگیری از آپلود فایل‌های حجیم
     const MAX_FILE_SIZE = 2 * 1024 * 1024;
+
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: "File size exceeds 2MB limit" }, { status: 400 });
+      return NextResponse.json(
+        { error: "File size exceeds 2MB limit" },
+        { status: 400 }
+      );
+    }
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json(
+        { error: "Only JPG, PNG and WEBP images are allowed" },
+        { status: 400 }
+      );
     }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadDir = join(process.cwd(), "public/uploads");
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-      // پوشه از قبل وجود داره
-    }
+    const uploadResult = await new Promise<any>((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          folder: "caterie/avatars",
+          public_id: `user-${userId}`,
+          overwrite: true,
+          resource_type: "image",
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(buffer);
+    });
 
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const filename = `${userId}-${uniqueSuffix}-${file.name.replace(/\s+/g, "_")}`;
-    const filepath = join(uploadDir, filename);
-
-    await writeFile(filepath, buffer);
-
-    const publicUrl = `/uploads/${filename}`;
+    const avatarUrl = uploadResult.secure_url;
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { avatar: publicUrl },
+      data: { avatar: avatarUrl },
     });
 
-    return NextResponse.json({ success: true, avatar: publicUrl, user: updatedUser });
+    return NextResponse.json({
+      success: true,
+      avatar: avatarUrl,
+      user: updatedUser,
+    });
+
   } catch (error) {
     console.error("Upload error:", error);
-    return NextResponse.json({ error: "Failed to upload image" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Failed to upload image" },
+      { status: 500 }
+    );
   }
 }
