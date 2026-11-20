@@ -1,8 +1,10 @@
+
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { otpSendLimiter } from "@/lib/rate-limit";
 import { Resend } from "resend";
-import { emailSchema } from "@/lib/validations"; // 👈 ایمپورت اسکیما
+import { emailSchema } from "@/lib/validations";
+import { randomInt } from "crypto";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -15,49 +17,58 @@ export async function POST(req: Request) {
     if (!success) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
-        { 
+        {
           status: 429,
           headers: {
             "X-RateLimit-Limit": limit.toString(),
             "X-RateLimit-Remaining": remaining.toString(),
             "X-RateLimit-Reset": reset.toString(),
-          }
+          },
         }
       );
     }
 
     const { email } = await req.json();
 
-    // 👇 ۲. اعتبارسنجی ایمیل با Zod
+    // ۲. اعتبارسنجی ایمیل با Zod
     const validation = emailSchema.safeParse(email);
+
     if (!validation.success) {
       return NextResponse.json(
-        { error: validation.error.issues[0].message }, 
+        { error: validation.error.issues[0].message },
         { status: 400 }
       );
     }
 
+    const validatedEmail = validation.data;
+
     // ۳. بررسی وجود کاربر
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email: validatedEmail },
+    });
+
     if (!user) {
-      return NextResponse.json({ error: "User with this email not found." }, { status: 404 });
+      return NextResponse.json(
+        { error: "User with this email not found." },
+        { status: 404 }
+      );
     }
 
-    // ۴. تولید کد ۶ رقمی
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // ۴. تولید کد ۶ رقمی امن
+    const otp = randomInt(100000, 1000000).toString();
     const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     // ۵. ذخیره در دیتابیس
     await prisma.user.update({
-      where: { email },
+      where: { email: validatedEmail },
       data: { otp, otpExpiresAt },
     });
 
     // ۶. ارسال ایمیل با Resend
     const { data, error } = await resend.emails.send({
-      from: 'Caterie <onboarding@resend.dev>',
-      to: email,
-      subject: 'Your Caterie Verification Code',
+      from: "Caterie <kinglittle966@gmail.com>",
+      to: validatedEmail,
+      subject: "Your Caterie Verification Code",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
           <h2 style="color: #333;">Your Verification Code</h2>
@@ -72,14 +83,31 @@ export async function POST(req: Request) {
 
     if (error) {
       console.error("Resend error:", error);
-      return NextResponse.json({ error: "Failed to send email. Please try again." }, { status: 500 });
+
+      // پاک کردن OTP در صورت شکست ارسال ایمیل
+      await prisma.user.update({
+        where: { email: validatedEmail },
+        data: { otp: null, otpExpiresAt: null },
+      });
+
+      return NextResponse.json(
+        { error: "Failed to send email. Please try again." },
+        { status: 500 }
+      );
     }
 
-    console.log(`✅ OTP email sent to ${email}. Resend ID: ${data?.id}`);
+    console.log(`✅ OTP email sent to ${validatedEmail}. Resend ID: ${data?.id}`);
 
-    return NextResponse.json({ success: true, message: "OTP sent successfully" });
+    return NextResponse.json({
+      success: true,
+      message: "OTP sent successfully",
+    });
   } catch (error) {
     console.error("Send OTP error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
