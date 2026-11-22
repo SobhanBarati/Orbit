@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import prisma from "@/lib/prisma";
@@ -65,22 +64,18 @@ export async function POST(req: Request) {
       );
     }
 
+    // 👇 تبدیل فایل به Data URI (Base64) - راه‌حل قطعی برای Vercel
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const base64Data = buffer.toString('base64');
+    const fileUri = `data:${file.type};base64,${base64Data}`;
 
-    const uploadResult = await new Promise<any>((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        {
-          folder: "caterie/avatars",
-          public_id: `user-${userId}`,
-          overwrite: true,
-          resource_type: "image",
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      ).end(buffer);
+    // 👇 استفاده از متد upload به جای upload_stream
+    const uploadResult = await cloudinary.uploader.upload(fileUri, {
+      folder: "caterie/avatars",
+      public_id: `user-${userId}`,
+      overwrite: true,
+      resource_type: "image",
     });
 
     const avatarUrl = uploadResult.secure_url;
