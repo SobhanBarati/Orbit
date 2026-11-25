@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePeople } from "../api/use-people";
 import { format } from "date-fns";
@@ -16,6 +16,7 @@ interface PeopleTableProps {
   activeTab?: string;
 }
 
+// ... (توابع getTeamBadge و getStatusBadge بدون تغییر) ...
 const getTeamBadge = (team: string) => {
   switch (team) {
     case "Design": return "bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 border-purple-100 dark:border-purple-900/50";
@@ -41,7 +42,10 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
   
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [editingMember, setEditingMember] = useState<any>(null);
-  const [openStatusId, setOpenStatusId] = useState<string | null>(null); // 👈 استیت برای کنترل منوی وضعیت
+  const [openStatus, setOpenStatus] = useState<{ id: string, rect: DOMRect, buttonRect: DOMRect } | null>(null);
+  
+  // 👇 استیت جدید برای نگه داشتن ID کاربری که در حال آپدیته
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
@@ -49,16 +53,28 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
   const queryClient = useQueryClient();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // بستن منوی وضعیت با کلیک بیرون از آن
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpenStatusId(null);
-      }
+      if (!openStatus) return;
+      if (menuRef.current && menuRef.current.contains(event.target as Node)) return;
+
+      const buttonRect = openStatus.buttonRect;
+      const clickX = event.clientX;
+      const clickY = event.clientY;
+      
+      if (
+        clickX >= buttonRect.left &&
+        clickX <= buttonRect.right &&
+        clickY >= buttonRect.top &&
+        clickY <= buttonRect.bottom
+      ) return; 
+
+      setOpenStatus(null);
     };
+    
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [openStatus]);
 
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
@@ -73,6 +89,9 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      // 👇 قبل از شروع، ID رو ست کن
+      setUpdatingId(id);
+      
       const res = await fetch("/api/people", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -84,8 +103,15 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["people"] });
       queryClient.invalidateQueries({ queryKey: ["people-with-logs"] });
-      setOpenStatusId(null); // بستن منو بعد از تغییر
+      // 👇 بعد از موفقیت، منو رو ببند و ID رو پاک کن
+      setOpenStatus(null);
+      setUpdatingId(null);
     },
+    onError: () => {
+      // 👇 در صورت خطا هم ID رو پاک کن
+      setUpdatingId(null);
+      showToast("Failed to update status.");
+    }
   });
 
   const showToast = (message: string) => {
@@ -93,6 +119,7 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
     setTimeout(() => setToastMessage(null), 3000);
   };
 
+  // ... (بقیه توابع handleBulkAction, toggleRow, handleRowClick, handleOpenStatus, filteredMembers بدون تغییر) ...
   const handleBulkAction = async (status: "Active" | "Inactive") => {
     setIsBulkUpdating(true);
     try {
@@ -105,14 +132,11 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
           })
         )
       );
-      
       queryClient.invalidateQueries({ queryKey: ["people"] });
       queryClient.invalidateQueries({ queryKey: ["people-with-logs"] });
-      
       const count = selectedRows.length;
       setSelectedRows([]); 
       showToast(`${count} member${count > 1 ? 's' : ''} marked as ${status}.`);
-      
     } catch (error) {
       console.error(error);
       showToast("Something went wrong. Please try again.");
@@ -132,6 +156,18 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
     setSelectedRows(prev => 
       prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
     );
+  };
+
+  const handleOpenStatus = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (updatingId) return; // اگه در حال آپدیته، کاری نکن
+    
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    if (openStatus?.id === id) {
+      setOpenStatus(null);
+      return;
+    }
+    setOpenStatus({ id, rect, buttonRect: rect });
   };
 
   const filteredMembers = useMemo(() => {
@@ -167,9 +203,7 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
         <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mb-4 border border-border">
           <Users className="w-8 h-8 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium text-foreground mb-1">
-          No members found
-        </h3>
+        <h3 className="text-lg font-medium text-foreground mb-1">No members found</h3>
         <p className="text-sm text-muted-foreground max-w-sm mb-6">
           {searchQuery 
             ? `No members found matching "${searchQuery}".` 
@@ -189,50 +223,31 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
         </div>
       )}
 
-      {/* نوار عملیات گروهی */}
-      {selectedRows.length > 0 && (
-        <div className="fixed md:absolute bottom-4 md:bottom-auto md:-top-20 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-fit mx-auto bg-foreground text-background px-4 py-3 md:py-2.5 rounded-2xl md:rounded-full shadow-xl flex flex-col md:flex-row items-center gap-3 md:gap-4 animate-in slide-in-from-bottom-4 z-50 border border-border">
-          <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
-            <span className="text-sm font-medium md:pl-2">{selectedRows.length} selected</span>
-            <button 
-              onClick={() => setSelectedRows([])} 
-              className="md:hidden p-1 rounded-full hover:bg-background/20 transition-colors"
+      {openStatus && (
+        <div 
+          ref={menuRef}
+          className="fixed z-[9999] w-28 bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1"
+          style={{
+            top: openStatus.rect.bottom + 4,
+            left: openStatus.rect.left - 112 + openStatus.rect.width,
+          }}
+        >
+          {["Active", "New", "Away", "Inactive"].map((status) => (
+            <button
+              key={status}
+              onClick={(e) => {
+                e.stopPropagation();
+                updateStatus.mutate({ id: openStatus.id, status });
+              }}
+              className="w-full text-left px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-muted transition-colors"
             >
-              <X className="w-4 h-4" />
+              {status}
             </button>
-          </div>
-          
-          <div className="hidden md:block w-px h-5 bg-background/20" />
-          
-          <div className="flex gap-2 w-full md:w-auto">
-            <button 
-              onClick={() => handleBulkAction("Active")}
-              disabled={isBulkUpdating}
-              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 py-2 md:py-1.5 rounded-xl md:rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors disabled:opacity-50"
-            >
-              {isBulkUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
-              Mark Active
-            </button>
-            <button 
-              onClick={() => handleBulkAction("Inactive")}
-              disabled={isBulkUpdating}
-              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 py-2 md:py-1.5 rounded-xl md:rounded-full text-xs font-medium bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 transition-colors disabled:opacity-50"
-            >
-              {isBulkUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldBan className="w-3.5 h-3.5" />}
-              Mark Inactive
-            </button>
-          </div>
-
-          <button 
-            onClick={() => setSelectedRows([])} 
-            className="hidden md:block ml-2 p-1 rounded-full hover:bg-background/20 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          ))}
         </div>
       )}
 
-      {/* نمای دسکتاپ */}
+      {/* بخش دسکتاپ */}
       <div className="hidden md:block w-full overflow-visible p-6">
         <table className="w-full text-sm text-left border-collapse">
           <thead className="text-xs text-muted-foreground font-medium border-b border-border transition-colors">
@@ -249,6 +264,7 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
           <tbody>
             {filteredMembers.map((member: any) => {
               const isSelected = selectedRows.includes(member.id);
+              const isUpdating = updatingId === member.id; // 👈 چک میکنیم این کاربر در حال آپدیته یا نه
 
               return (
                 <tr 
@@ -260,13 +276,12 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
                       : "bg-transparent hover:bg-muted/30"
                   }`}
                 >
+                  {/* ... (بقیه سلول‌ها) ... */}
                   <td className="py-3 pl-4">
                     <div 
                       onClick={(e) => toggleRow(member.id, e)}
                       className={`w-4 h-4 flex items-center justify-center rounded-[4px] border transition-all duration-200 ${
-                        isSelected 
-                          ? 'bg-foreground border-foreground text-background'
-                          : 'bg-transparent border-border group-hover:border-muted-foreground'
+                        isSelected ? 'bg-foreground border-foreground text-background' : 'bg-transparent border-border group-hover:border-muted-foreground'
                       }`}
                     >
                       {isSelected && <Check className="w-3 h-3" strokeWidth={4} />}
@@ -276,9 +291,7 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
                   <td className="py-3 font-medium text-foreground flex items-center gap-3 transition-colors">
                     <Avatar className="w-8 h-8 border border-border">
                       <AvatarImage src={member.avatar || undefined} />
-                      <AvatarFallback className="bg-muted text-muted-foreground">
-                        {member.name.charAt(0)}
-                      </AvatarFallback>
+                      <AvatarFallback className="bg-muted text-muted-foreground">{member.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <span className="text-foreground">{member.name}</span>
                   </td>
@@ -297,34 +310,20 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
                   <td className="py-3 pr-4">
                     <div className="flex items-center justify-end gap-2">
                       {isHR ? (
-                        <div className="relative" ref={openStatusId === member.id ? menuRef : null}>
+                        <div className="relative">
+                          {/* 👇 دکمه وضعیت با حالت لودینگ */}
                           <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenStatusId(openStatusId === member.id ? null : member.id);
-                            }}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-colors duration-300 ${getStatusBadge(member.status)}`}
+                            disabled={isUpdating}
+                            onClick={(e) => handleOpenStatus(e, member.id)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-colors duration-300 ${getStatusBadge(member.status)} ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
                           >
-                            {member.status}
-                            <ChevronDown className={`w-3 h-3 opacity-50 transition-transform ${openStatusId === member.id ? 'rotate-180' : ''}`} />
+                            {isUpdating ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              member.status
+                            )}
+                            {!isUpdating && <ChevronDown className={`w-3 h-3 opacity-50 transition-transform ${openStatus?.id === member.id ? 'rotate-180' : ''}`} />}
                           </button>
-                          
-                          {openStatusId === member.id && (
-                            <div className="absolute right-0 top-full mt-1 w-28 bg-card border border-border rounded-xl shadow-lg transition-all z-50 overflow-hidden animate-in fade-in slide-in-from-top-1">
-                              {["Active", "New", "Away", "Inactive"].map((status) => (
-                                <button
-                                  key={status}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    updateStatus.mutate({ id: member.id, status });
-                                  }}
-                                  className="w-full text-left px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-muted transition-colors"
-                                >
-                                  {status}
-                                </button>
-                              ))}
-                            </div>
-                          )}
                         </div>
                       ) : (
                         <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${getStatusBadge(member.status)}`}>
@@ -352,28 +351,25 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
         </table>
       </div>
 
-      {/* 👇 نمای موبایل */}
+      {/* بخش موبایل */}
       <div className="md:hidden flex flex-col p-2 overflow-hidden">
         {filteredMembers.map((member: any) => {
           const isSelected = selectedRows.includes(member.id);
+          const isUpdating = updatingId === member.id; // 👈 همینجا هم چک میکنیم
 
           return (
             <div 
               key={member.id}
               onClick={() => handleRowClick(member.id)}
               className={`flex items-center justify-between p-2.5 rounded-xl transition-all duration-200 cursor-pointer ${
-                isSelected 
-                  ? "bg-muted/80 shadow-sm" 
-                  : "bg-transparent hover:bg-muted/40"
+                isSelected ? "bg-muted/80 shadow-sm" : "bg-transparent hover:bg-muted/40"
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <div 
                   onClick={(e) => toggleRow(member.id, e)}
                   className={`w-4 h-4 shrink-0 flex items-center justify-center rounded-[4px] border transition-all duration-200 ${
-                    isSelected 
-                      ? 'bg-foreground border-foreground text-background'
-                      : 'bg-transparent border-border'
+                    isSelected ? 'bg-foreground border-foreground text-background' : 'bg-transparent border-border'
                   }`}
                 >
                   {isSelected && <Check className="w-3 h-3" strokeWidth={4} />}
@@ -381,9 +377,7 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
 
                 <Avatar className="w-9 h-9 border border-border shrink-0">
                   <AvatarImage src={member.avatar || undefined} />
-                  <AvatarFallback className="bg-muted text-muted-foreground font-bold text-xs">
-                    {member.name.charAt(0)}
-                  </AvatarFallback>
+                  <AvatarFallback className="bg-muted text-muted-foreground font-bold text-xs">{member.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 
                 <div className="flex flex-col min-w-0">
@@ -394,34 +388,20 @@ export function PeopleTable({ searchQuery = "", activeTab = "All" }: PeopleTable
 
               <div className="flex items-center gap-1 shrink-0 ml-1">
                 {isHR ? (
-                  <div className="relative" ref={openStatusId === member.id ? menuRef : null}>
+                  <div className="relative">
+                    {/* 👇 دکمه وضعیت با حالت لودینگ */}
                     <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setOpenStatusId(openStatusId === member.id ? null : member.id);
-                      }}
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors duration-300 ${getStatusBadge(member.status)}`}
+                      disabled={isUpdating}
+                      onClick={(e) => handleOpenStatus(e, member.id)}
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors duration-300 ${getStatusBadge(member.status)} ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      {member.status}
-                      <ChevronDown className={`w-3 h-3 opacity-50 transition-transform ${openStatusId === member.id ? 'rotate-180' : ''}`} />
+                      {isUpdating ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        member.status
+                      )}
+                      {!isUpdating && <ChevronDown className={`w-3 h-3 opacity-50 transition-transform ${openStatus?.id === member.id ? 'rotate-180' : ''}`} />}
                     </button>
-                    
-                    {openStatusId === member.id && (
-                      <div className="absolute right-0 top-full mt-1 w-24 bg-card border border-border rounded-xl shadow-lg transition-all z-50 overflow-hidden animate-in fade-in slide-in-from-top-1">
-                        {["Active", "New", "Away", "Inactive"].map((status) => (
-                          <button
-                            key={status}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateStatus.mutate({ id: member.id, status });
-                            }}
-                            className="w-full text-left px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-muted transition-colors"
-                          >
-                            {status}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 ) : (
                   <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusBadge(member.status)}`}>
